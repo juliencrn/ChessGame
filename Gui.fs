@@ -1,6 +1,7 @@
 module Gui
 
-open Types
+open Domain.Types
+open Domain.Constants
 
 let drawBoard (gameState: GameState) =
     let getPieceSymbol (piece: Piece) =
@@ -34,13 +35,17 @@ let drawBoard (gameState: GameState) =
         printfn ""
         drawBoardSeparator ()
 
+    let to2DCellBoard (cells: Cell list) : Cell list list =
+        RANKS
+        |> List.map (fun rank -> cells |> List.filter (fun cell -> cell.position.rank = rank))
+
 
 
     printfn ""
     drawRankLetterUnits ()
     drawBoardSeparator ()
 
-    gameState.board |> List.iteri drawRow
+    gameState.board |> to2DCellBoard |> List.iteri drawRow
 
     drawRankLetterUnits ()
 

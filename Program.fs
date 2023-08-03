@@ -1,7 +1,6 @@
-﻿open Functions
+﻿open InitializeGame
 open Gui
 open Newtonsoft.Json
-
 
 [<EntryPoint>]
 let main argv =

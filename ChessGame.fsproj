@@ -6,8 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Types.fs" />
-    <Compile Include="Functions.fs" />
+    <Compile Include="Domain.Types.fs" />
+    <Compile Include="Domain.Constants.fs" />
+    <Compile Include="Move.Functions.fs" />
+    <Compile Include="LegalMoves.fs" />
+    <Compile Include="InitializeGame.fs" />
     <Compile Include="Gui.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

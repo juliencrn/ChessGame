@@ -6,11 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Domain.Types.fs" />
-    <Compile Include="Domain.Constants.fs" />
+    <Compile Include="Result.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Constants.fs" />
+    <Compile Include="Api.fs" />
+    <Compile Include="InitializeGame.fs" />
     <Compile Include="Move.Functions.fs" />
     <Compile Include="LegalMoves.fs" />
-    <Compile Include="InitializeGame.fs" />
+    <Compile Include="TryMovePiece.fs" />
     <Compile Include="Gui.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

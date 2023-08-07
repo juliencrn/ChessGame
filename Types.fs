@@ -1,5 +1,7 @@
 module Domain.Types
 
+// Primitives types
+
 type Rank = // rows
     | Rank8
     | Rank7
@@ -25,12 +27,14 @@ type Camp =
     | Black
 
 type PieceKind =
-    | King
-    | Queen
-    | Rook
-    | Bishop
-    | Knight
-    | Pawn
+    | King // roi
+    | Queen // rene
+    | Rook // tour
+    | Bishop // fou
+    | Knight // cavalier
+    | Pawn // pion
+
+// Value-objects
 
 type Position = { rank: Rank; file: File }
 
@@ -46,6 +50,8 @@ type Cell =
 type GameStatus =
     | InProgress of Camp
     | Win of Camp
+
+// Aggregate root like
 
 type GameState =
     { board: Cell list; status: GameStatus }

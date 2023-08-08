@@ -53,5 +53,6 @@ type GameStatus =
 
 // Aggregate root like
 
-type GameState =
-    { board: Cell list; status: GameStatus }
+type Board = Cell list
+
+type GameState = { board: Board; status: GameStatus }

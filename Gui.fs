@@ -54,23 +54,36 @@ let rec askUserPosition () = // : UnvalidatedPosition =
         printfn "Invalid input: %s" (err.ToString())
         askUserPosition ()
 
-let drawBoard (gameState: GameState) =
+
+let drawBoard (board: Board) =
     let getPieceSymbol (piece: Piece) =
-        match piece.kind with
-        | King -> "K"
-        | Queen -> "Q"
-        | Rook -> "R"
-        | Bishop -> "B"
-        | Knight -> "N"
-        | Pawn -> "P"
+        match piece.camp, piece.kind with
+        | Black, King -> "♚"
+        | White, King -> "♔"
+        | Black, Queen -> "♛"
+        | White, Queen -> "♕"
+        | Black, Rook -> "♜"
+        | White, Rook -> "♖"
+        | Black, Bishop -> "♝"
+        | White, Bishop -> "♗"
+        | Black, Knight -> "♞"
+        | White, Knight -> "♘"
+        | Black, Pawn -> "♟︎"
+        | White, Pawn -> "♙"
 
     let drawCell (cell: Cell) =
         match cell.state with
         | Occupied piece -> getPieceSymbol piece
-        | Empty -> "-"
+        | Empty -> " "
 
-    let drawBoardSeparator () =
-        printfn "   +---+---+---+---+---+---+---+---+"
+    let drawBoardTopSeparator () =
+        printfn "   ┌───┬───┬───┬───┬───┬───┬───┬───┐"
+
+    let drawBoardMiddleSeparator () =
+        printfn "   ├───┼───┼───┼───┼───┼───┼───┼───┤"
+
+    let drawBoardBottomSeparator () =
+        printfn "   └───┴───┴───┴───┴───┴───┴───┴───┘"
 
     let drawRankLetterUnits () =
         printfn "     a   b   c   d   e   f   g   h"
@@ -80,24 +93,33 @@ let drawBoard (gameState: GameState) =
         printf " %d " rank
 
         let cellSymbols = List.map drawCell cells
-        cellSymbols |> List.iter (fun symbol -> printf "| %s " symbol)
+        cellSymbols |> List.iter (fun symbol -> printf "│ %s " symbol)
 
-        printf "| %d" rank
+        printf "│ %d" rank
         printfn ""
-        drawBoardSeparator ()
+
+        match rank = 1 with
+        | false -> drawBoardMiddleSeparator ()
+        | true -> drawBoardBottomSeparator ()
 
     let to2DCellBoard (cells: Cell list) : Cell list list =
         RANKS
         |> List.map (fun rank -> cells |> List.filter (fun cell -> cell.position.rank = rank))
 
-    printfn ""
     drawRankLetterUnits ()
-    drawBoardSeparator ()
-
-    gameState.board |> to2DCellBoard |> List.iteri drawRow
-
+    drawBoardTopSeparator ()
+    board |> to2DCellBoard |> List.iteri drawRow
     drawRankLetterUnits ()
 
-    printfn ""
-    printfn "Game Status: %A" gameState.status
-    printfn ""
+
+let drawStatus (gameStatus: GameStatus) =
+    match gameStatus with
+    | Win camp -> printfn "Checkmate. %s player win! " (camp.ToString())
+    | InProgress camp -> printfn "Turn: %s" (camp.ToString())
+
+
+let drawGame ({ board = board; status = status }: GameState) : unit =
+    Console.Clear()
+    drawBoard board
+    drawStatus status
+    ()

@@ -1,6 +1,6 @@
-module Domain.Api
+module ChessGame.Api
 
-open Domain.Types
+open ChessGame.Common
 
 // --- Input data, DTOs ---
 

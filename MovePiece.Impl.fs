@@ -1,9 +1,9 @@
-module Domain.TryMovePiece
+module ChessGame.MovePiece.Impl
 
-open Domain.Types
-open Domain.Api
-open LegalMoves
-open Utils
+open ChessGame.Common
+open ChessGame.Api
+open ChessGame.Helper.LegalMoves
+open ChessGame.Helper.Adapters
 
 // --- life cycle, list of states ---
 

@@ -1,8 +1,8 @@
-﻿open App.Gui
-open Domain.Types
-open Domain.Api
-open Domain.InitializeGame
-open Domain.TryMovePiece
+﻿open ChessGame.Gui
+open ChessGame.Common
+open ChessGame.Api
+open ChessGame.InitializeGame.Impl
+open ChessGame.MovePiece.Impl
 
 let getUserInput () =
     printf "Piece to move: "

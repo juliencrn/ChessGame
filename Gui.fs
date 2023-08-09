@@ -1,34 +1,9 @@
-module App.Gui
+module ChessGame.Gui
 
 open System
-open Utils
-open Domain.Types
-open Domain.Constants
-open Domain.Api
-
-let validateRank (row: int) : Result<Rank, GameError> =
-    match row with
-    | 1 -> Ok Rank1
-    | 2 -> Ok Rank2
-    | 3 -> Ok Rank3
-    | 4 -> Ok Rank4
-    | 5 -> Ok Rank5
-    | 6 -> Ok Rank6
-    | 7 -> Ok Rank7
-    | 8 -> Ok Rank8
-    | _ -> Error(GameError "Invalid rank, should be between 1 and 8 (included)")
-
-let validateFile (column: string) : Result<File, GameError> =
-    match column with
-    | "a" -> Ok FileA
-    | "b" -> Ok FileB
-    | "c" -> Ok FileC
-    | "d" -> Ok FileD
-    | "e" -> Ok FileE
-    | "f" -> Ok FileF
-    | "g" -> Ok FileG
-    | "h" -> Ok FileH
-    | _ -> Error(GameError "Invalid column, should be between `a` and `h` (included)")
+open ChessGame.Helper.Adapters
+open ChessGame.Common
+open ChessGame.Api
 
 let parsePosition (input: string) : Result<Position, GameError> =
     let column = input[0] |> Char.ToLower |> string
@@ -36,12 +11,12 @@ let parsePosition (input: string) : Result<Position, GameError> =
 
     match Int32.TryParse(rowStr) with
     | true, row ->
-        let rankResult = validateRank row
-        let fileResult = validateFile column
+        let rankResult = Rank.create row
+        let fileResult = File.create column
 
         match combineResults rankResult fileResult with
         | Ok(rank, file) -> Ok({ rank = rank; file = file })
-        | Error err -> Error err
+        | Error err -> Error(GameError err)
 
     | _ -> Error(GameError "Cannot parse input. Format like `a4` or `f3`")
 
@@ -103,7 +78,7 @@ let drawBoard (board: Board) =
         | true -> drawBoardBottomSeparator ()
 
     let to2DCellBoard (cells: Cell list) : Cell list list =
-        RANKS
+        Rank.getAll ()
         |> List.map (fun rank -> cells |> List.filter (fun cell -> cell.position.rank = rank))
 
     drawRankLetterUnits ()

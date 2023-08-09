@@ -1,37 +1,33 @@
-module Domain.InitializeGame
+module ChessGame.InitializeGame.Impl
 
-open Domain.Types
-open Domain.Constants
-open Domain.Api
+open ChessGame.Common
+open ChessGame.Api
 
 let initializeGame: InitializeGame =
     fun () ->
-        // Cell helpers
-        // ============
-
-        // Improve with Builder pattern?
-        let createCell (state: CellState) (rank: Rank) (file: File) : Cell =
-            { position = { rank = rank; file = file }
-              state = state }
-
-        let createEmptyCell = createCell Empty
-
-        let createPieceCell (camp: Camp) (kind: PieceKind) =
-            createCell (Occupied { camp = camp; kind = kind })
-
         // Row helpers
         // ===========
 
         let createEmptyRow (rank: Rank) : Cell list =
-            FILES |> List.map (fun file -> createEmptyCell rank file)
+            File.getAll ()
+            |> List.map (fun file -> Cell.createEmpty (Position.create file rank))
 
         let createPawnRow (rank: Rank) (camp: Camp) : Cell list =
-            FILES |> List.map (fun file -> createPieceCell camp Pawn rank file)
+            File.getAll ()
+            |> List.map (fun file ->
+                let position = Position.create file rank
+                let piece = Piece.create camp Pawn
+
+                Cell.createOccupied position piece)
 
         let createFirstRow (rank: Rank) (camp: Camp) : Cell list =
-            let create (kind: PieceKind) (file: File) = createPieceCell camp kind rank file
+            let create (kind: PieceKind) (file: File) =
+                let position = Position.create file rank
+                let piece = Piece.create camp kind
 
-            FILES
+                Cell.createOccupied position piece
+
+            File.getAll ()
             |> List.map (fun file ->
                 match file with
                 | (FileA | FileH) -> create Rook file
@@ -43,7 +39,7 @@ let initializeGame: InitializeGame =
         // Build board
         // ===========
 
-        let cells: Cell list =
+        let board: Board =
             [ createFirstRow Rank8 Black
               createPawnRow Rank7 Black
               createEmptyRow Rank6
@@ -65,5 +61,5 @@ let initializeGame: InitializeGame =
         //     { camp = White
         //       availablePieces = getAvailableWhitePieces cells }
 
-        { board = cells
+        { board = board
           status = InProgress White }

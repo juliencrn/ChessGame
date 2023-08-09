@@ -1,4 +1,4 @@
-module Utils
+module ChessGame.Helper.Adapters
 
 // / Just a wrapper to ensure non-empty list
 // module NonEmptyList =

@@ -1,6 +1,6 @@
-namespace global  // note use of GLOBAL namespace
+namespace global // note use of GLOBAL namespace
 
-open System
+// open System
 
 //==============================================
 // Helpers for Result type and AsyncResult type
@@ -19,7 +19,7 @@ type Result<'success, 'failure> =
 
 /// Functions for Result type (functor and monad).
 /// For applicatives, see Validation.
-[<RequireQualifiedAccess>]  // RequireQualifiedAccess forces the `Result.xxx` prefix to be used
+[<RequireQualifiedAccess>] // RequireQualifiedAccess forces the `Result.xxx` prefix to be used
 module Result =
 
     /// Pass in a function to handle each case of `Result`
@@ -58,13 +58,12 @@ module Result =
     let bind = Result.bind
 
     // Like `map` but with a unit-returning function
-    let iter (f : _ -> unit) result =
-        map f result |> ignore
+    let iter (f: _ -> unit) result = map f result |> ignore
 
     /// Apply a Result<fn> to a Result<x> monadically
     let apply fR xR =
         match fR, xR with
-        | Ok f, Ok x -> Ok (f x)
+        | Ok f, Ok x -> Ok(f x)
         | Error err1, Ok _ -> Error err1
         | Ok _, Error err2 -> Error err2
         | Error err1, Error _ -> Error err1
@@ -74,7 +73,7 @@ module Result =
     let sequence aListOfResults =
         let (<*>) = apply // monadic
         let (<!>) = map
-        let cons head tail = head::tail
+        let cons head tail = head :: tail
         let consR headR tailR = cons <!> headR <*> tailR
         let initialValue = Ok [] // empty list inside Result
 
@@ -121,8 +120,7 @@ module Result =
         | Error _ -> false
 
     /// Predicate that returns true on failure
-    let isError xR =
-        xR |> isOk |> not
+    let isError xR = xR |> isOk |> not
 
     /// Lift a given predicate into a predicate that works on Results
     let filter pred =
@@ -182,38 +180,46 @@ module ResultComputationExpression =
         member __.Bind(x, f) = Result.bind f x
 
         member __.ReturnFrom(x) = x
-        member this.Zero() = this.Return ()
+        member this.Zero() = this.Return()
 
         member __.Delay(f) = f
-        member __.Run(f) = f()
+        member __.Run(f) = f ()
 
         member this.While(guard, body) =
-            if not (guard())
-            then this.Zero()
-            else this.Bind( body(), fun () ->
-                this.While(guard, body))
+            if not (guard ()) then
+                this.Zero()
+            else
+                this.Bind(body (), (fun () -> this.While(guard, body)))
 
         member this.TryWith(body, handler) =
-            try this.ReturnFrom(body())
-            with e -> handler e
+            try
+                this.ReturnFrom(body ())
+            with e ->
+                handler e
 
         member this.TryFinally(body, compensation) =
-            try this.ReturnFrom(body())
-            finally compensation()
+            try
+                this.ReturnFrom(body ())
+            finally
+                compensation ()
 
-        member this.Using(disposable:#System.IDisposable, body) =
+        member this.Using(disposable: #System.IDisposable, body) =
             let body' = fun () -> body disposable
-            this.TryFinally(body', fun () ->
-                match disposable with
+
+            this.TryFinally(
+                body',
+                fun () ->
+                    match disposable with
                     | null -> ()
-                    | disp -> disp.Dispose())
+                    | disp -> disp.Dispose()
+            )
 
-        member this.For(sequence:seq<_>, body) =
-            this.Using(sequence.GetEnumerator(),fun enum ->
-                this.While(enum.MoveNext,
-                    this.Delay(fun () -> body enum.Current)))
+        member this.For(sequence: seq<_>, body) =
+            this.Using(
+                sequence.GetEnumerator(),
+                fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current))
+            )
 
-        member this.Combine (a,b) =
-            this.Bind(a, fun () -> b())
+        member this.Combine(a, b) = this.Bind(a, (fun () -> b ()))
 
     let result = new ResultBuilder()

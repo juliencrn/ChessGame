@@ -25,7 +25,6 @@ let validatePieceCamp camp (piece: Piece) =
     | true -> Ok piece
 
 let addLegalMoves position piece =
-    // TODO: This not include any check about cell occupation
     let legalMoves = getLegalMoveFn piece position
 
     let pickedPiece: PickedPiece =
@@ -42,6 +41,14 @@ let toGameState board camp pickedPiece =
 
 // --- Workflow ---
 
+
+// TODO: During legalMoves computation, check if the cell is empty,
+//       | Empty -> Ok
+//       | Occupied by adverse -> Ok once
+//       | Occupied by me -> Error "Cannot capture your own piece"
+
+// TODO: If legalMoves is Empty, we cannot move the piece and should return an Error
+// TODO: Pawn could move twice when it is its first move
 let pickPiece: PickPiece =
     fun
         { board = board

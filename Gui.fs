@@ -90,6 +90,7 @@ let drawBoard (board: Board) (possibleMoves: Position list) =
     drawBoardTopSeparator ()
     board |> to2DCellBoard |> List.iteri drawRow
     drawRankLetterUnits ()
+    printfn ""
 
 
 let drawGame ({ board = board; status = status }: GameState) : unit =
@@ -102,12 +103,10 @@ let drawGame ({ board = board; status = status }: GameState) : unit =
 
     | PickingPiece camp ->
         drawBoard board []
-        printfn "Turn: %s" (camp.ToString())
         printfn "Stage: Picking a piece"
+        printfn "Turn: %s" (camp.ToString())
 
     | MovingPiece pickedPiece ->
         drawBoard board pickedPiece.legalMoves
-        printfn "Turn: %s" (pickedPiece.piece.camp.ToString())
         printfn "Stage: Make Move"
-        printfn "Legal moves: %s" (pickedPiece.legalMoves.ToString())
-        printfn "Picked piece: %s" (getPieceSymbol pickedPiece.piece)
+        printfn "Turn: %s" (pickedPiece.piece.camp.ToString())

@@ -31,6 +31,7 @@ let toGameState (camp: Camp) (board: Board) =
 
 // --- Workflow ---
 
+// TODO: Check end-of-game
 let movePiece: MovePiece =
     fun
         { board = board
@@ -40,7 +41,6 @@ let movePiece: MovePiece =
                                    piece = piece
                                    position = fromPosition } } } ->
 
-        // TODO: Check end-of-game
         validateLegalMove board legalMoves toPosition
         |> Result.bind (applyMoveOnBoard fromPosition toPosition piece)
         |> Result.bind (toGameState camp)

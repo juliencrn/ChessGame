@@ -30,26 +30,31 @@ let rec askUserPosition () = // : UnvalidatedPosition =
         askUserPosition ()
 
 
-let drawBoard (board: Board) =
-    let getPieceSymbol (piece: Piece) =
-        match piece.camp, piece.kind with
-        | Black, King -> "♚"
-        | White, King -> "♔"
-        | Black, Queen -> "♛"
-        | White, Queen -> "♕"
-        | Black, Rook -> "♜"
-        | White, Rook -> "♖"
-        | Black, Bishop -> "♝"
-        | White, Bishop -> "♗"
-        | Black, Knight -> "♞"
-        | White, Knight -> "♘"
-        | Black, Pawn -> "♟︎"
-        | White, Pawn -> "♙"
+let getPieceSymbol (piece: Piece) =
+    match piece.camp, piece.kind with
+    | Black, King -> "♚"
+    | White, King -> "♔"
+    | Black, Queen -> "♛"
+    | White, Queen -> "♕"
+    | Black, Rook -> "♜"
+    | White, Rook -> "♖"
+    | Black, Bishop -> "♝"
+    | White, Bishop -> "♗"
+    | Black, Knight -> "♞"
+    | White, Knight -> "♘"
+    | Black, Pawn -> "♟︎"
+    | White, Pawn -> "♙"
 
+let drawBoard (board: Board) (possibleMoves: Position list) =
     let drawCell (cell: Cell) =
-        match cell.state with
-        | Occupied piece -> getPieceSymbol piece
-        | Empty -> " "
+        let symbol =
+            match cell.state with
+            | Occupied piece -> getPieceSymbol piece
+            | Empty -> " "
+
+        match List.contains cell.position possibleMoves with
+        | true -> sprintf ">%s<" symbol
+        | false -> sprintf " %s " symbol
 
     let drawBoardTopSeparator () =
         printfn "   ┌───┬───┬───┬───┬───┬───┬───┬───┐"
@@ -67,8 +72,8 @@ let drawBoard (board: Board) =
         let rank = 8 - rankIndex
         printf " %d " rank
 
-        let cellSymbols = List.map drawCell cells
-        cellSymbols |> List.iter (fun symbol -> printf "│ %s " symbol)
+        let cellStrs = List.map drawCell cells
+        cellStrs |> List.iter (fun symbol -> printf "│%s" symbol)
 
         printf "│ %d" rank
         printfn ""
@@ -87,14 +92,22 @@ let drawBoard (board: Board) =
     drawRankLetterUnits ()
 
 
-let drawStatus (gameStatus: GameStatus) =
-    match gameStatus with
-    | Win camp -> printfn "Checkmate. %s player win! " (camp.ToString())
-    | InProgress camp -> printfn "Turn: %s" (camp.ToString())
-
-
 let drawGame ({ board = board; status = status }: GameState) : unit =
     Console.Clear()
-    drawBoard board
-    drawStatus status
-    ()
+
+    match status with
+    | Win camp ->
+        printfn "Checkmate. %s player win! " (camp.ToString())
+        drawBoard board []
+
+    | PickingPiece camp ->
+        drawBoard board []
+        printfn "Turn: %s" (camp.ToString())
+        printfn "Stage: Picking a piece"
+
+    | MovingPiece pickedPiece ->
+        drawBoard board pickedPiece.legalMoves
+        printfn "Turn: %s" (pickedPiece.piece.camp.ToString())
+        printfn "Stage: Make Move"
+        printfn "Legal moves: %s" (pickedPiece.legalMoves.ToString())
+        printfn "Picked piece: %s" (getPieceSymbol pickedPiece.piece)

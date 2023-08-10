@@ -50,16 +50,6 @@ let initializeGame: InitializeGame =
               createFirstRow Rank1 White ]
             |> List.concat
 
-        // let getAvailableWhitePieces (cells: Cell list) =
-        //     cells
-        //     |> List.filter (fun cell ->
-        //         match cell.state with
-        //         | Empty -> false
-        //         | Occupied piece -> piece.camp = White)
+        let status = PickingPiece White
 
-        // let nextMove =
-        //     { camp = White
-        //       availablePieces = getAvailableWhitePieces cells }
-
-        { board = board
-          status = InProgress White }
+        { board = board; status = status }

@@ -2,23 +2,27 @@ module ChessGame.Api
 
 open ChessGame.Common
 
-// --- Input data, DTOs ---
+// --- Input data ---
 
-type UnvalidatedRank = UnvalidatedRank of int
-type UnvalidatedFile = UnvalidatedFile of string
+type PickPieceInput = { fromPosition: Position }
 
-type UnvalidatedPosition =
-    { rank: UnvalidatedRank
-      file: UnvalidatedFile }
+type MovePieceInput =
+    { toPosition: Position
+      pickedPiece: PickedPiece }
 
-type UnvalidatedMoveInput =
-    { fromPosition: UnvalidatedPosition
-      toPosition: UnvalidatedPosition }
+type Command<'T> = { data: 'T; board: Board; camp: Camp }
 
+type PickPieceCommand = Command<PickPieceInput>
+type MovePieceCommand = Command<MovePieceInput>
 
 // --- Public API ---
 
+type GameError = GameError of string
+
 type InitializeGame = unit -> GameState
 
-type GameError = GameError of string
-// type TryMovePiece = GameState -> UnvalidatedMoveInput -> Result<GameState, GameError>
+type PickPiece = PickPieceCommand -> Result<GameState, GameError>
+
+type MovePiece = MovePieceCommand -> Result<GameState, GameError>
+
+// --- Helpers ---

@@ -3,25 +3,46 @@ open ChessGame.Common
 open ChessGame.Api
 open ChessGame.InitializeGame.Impl
 open ChessGame.MovePiece.Impl
+open ChessGame.PickPiece.Impl
 
-let getUserInput () =
+let getFromPositon () =
     printf "Piece to move: "
-    let fromPosition = askUserPosition ()
+    askUserPosition ()
 
-    printf "To position: "
-    let toPosition = askUserPosition ()
+let getToPositon () =
+    printf "To postion: "
+    askUserPosition ()
 
-    { fromPosition = fromPosition
-      toPosition = toPosition }
+let rec recTryPickPiece board camp =
+    let fromPosition = getFromPositon ()
 
-let rec askMoveUntilOk gameState =
-    let moveInput = getUserInput ()
-    let moveResult = tryMovePiece gameState moveInput
+    let pickPieceCommand =
+        { board = board
+          camp = camp
+          data = { fromPosition = fromPosition } }
 
-    match moveResult with
+    match pickPiece pickPieceCommand with
     | Error(GameError errMessage) ->
         printfn "Error: %s" errMessage
-        askMoveUntilOk gameState
+        recTryPickPiece board camp
+    | Ok newGameState -> newGameState
+
+let rec recTryMovePiece board (pickedPiece: PickedPiece) =
+    let toPosition = getToPositon ()
+
+    let movePieceCommand =
+        { board = board
+          camp = pickedPiece.piece.camp
+          data =
+            { toPosition = toPosition
+              pickedPiece = pickedPiece } }
+
+    let result = movePiece movePieceCommand
+
+    match result with
+    | Error(GameError errMessage) ->
+        printfn "Error: %s" errMessage
+        recTryMovePiece board pickedPiece
     | Ok newGameState -> newGameState
 
 let rec gameLoop (gameState: GameState) =
@@ -29,7 +50,12 @@ let rec gameLoop (gameState: GameState) =
 
     match gameState.status with
     | Win camp -> printfn "Checkmate. %s player win! " (camp.ToString())
-    | InProgress camp -> gameLoop (askMoveUntilOk gameState)
+    | PickingPiece camp ->
+        let newGameState = recTryPickPiece gameState.board camp
+        gameLoop newGameState
+    | MovingPiece pickedPiece ->
+        let newGameState = recTryMovePiece gameState.board pickedPiece
+        gameLoop newGameState
 
 
 [<EntryPoint>]

@@ -19,8 +19,14 @@ type CellState =
 type Cell =
     { position: Position; state: CellState }
 
+type PickedPiece =
+    { piece: Piece
+      position: Position
+      legalMoves: Position list }
+
 type GameStatus =
-    | InProgress of Camp
+    | PickingPiece of Camp
+    | MovingPiece of PickedPiece
     | Win of Camp
 
 type Board = Cell list

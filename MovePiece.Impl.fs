@@ -12,8 +12,15 @@ let validateMove (board: Board) (validPositions: Position list) (toPosition: Pos
     else
         Error(GameError "This move is not allowed")
 
-// TODO: Keep a list of Captured Pieces
 let applyMoveOnBoard (fromPosition: Position) (toPosition: Position) (piece: Piece) (board: Board) =
+    let captured =
+        board
+        |> List.tryFind (fun c -> c.position = toPosition)
+        |> Option.bind (fun c ->
+            match c.state with
+            | Empty -> None
+            | Occupied piece -> Some piece)
+
     let newBoard =
         board
         |> List.map (fun cell ->
@@ -24,12 +31,21 @@ let applyMoveOnBoard (fromPosition: Position) (toPosition: Position) (piece: Pie
             else
                 cell)
 
-    Ok newBoard
+    Ok(newBoard, captured)
 
-let toGameState (camp: Camp) (board: Board) =
+let toGameState (captured: Piece list) (camp: Camp) (changed: (Board * Piece option)) =
     let status = PickingPiece(Camp.getAdverse camp)
+    let (board, capturedOption) = changed
 
-    Ok { board = board; status = status }
+    let captured' =
+        match capturedOption with
+        | Some capturedPiece -> (capturedPiece :: captured)
+        | None -> captured
+
+    Ok
+        { board = board
+          status = status
+          captured = captured' }
 
 // --- Workflow ---
 
@@ -38,10 +54,11 @@ let movePiece: MovePiece =
     fun
         { board = board
           camp = camp
+          captured = captured
           data = { toPosition = toPosition
                    pickedPiece = { validPositions = validPositions
                                    piece = piece
                                    position = fromPosition } } } ->
         validateMove board validPositions toPosition
         |> Result.bind (applyMoveOnBoard fromPosition toPosition piece)
-        |> Result.bind (toGameState camp)
+        |> Result.bind (toGameState captured camp)

@@ -10,7 +10,11 @@ type MovePieceInput =
     { toPosition: Position
       pickedPiece: PickedPiece }
 
-type Command<'T> = { data: 'T; board: Board; camp: Camp }
+type Command<'T> =
+    { data: 'T
+      board: Board
+      camp: Camp
+      captured: Piece list }
 
 type PickPieceCommand = Command<PickPieceInput>
 type MovePieceCommand = Command<MovePieceInput>

@@ -31,7 +31,10 @@ type GameStatus =
 
 type Board = Cell list
 
-type GameState = { board: Board; status: GameStatus }
+type GameState =
+    { board: Board
+      status: GameStatus
+      captured: Piece list }
 
 
 // ===============================

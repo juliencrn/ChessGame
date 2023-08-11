@@ -37,10 +37,13 @@ let addValidPositions board camp position piece =
 
         Ok pickedPiece
 
-let toGameState board camp pickedPiece =
+let toGameState board captured pickedPiece =
     let status = MovingPiece pickedPiece
 
-    Ok { board = board; status = status }
+    Ok
+        { board = board
+          status = status
+          captured = captured }
 
 // --- Workflow ---
 
@@ -48,10 +51,11 @@ let pickPiece: PickPiece =
     fun
         { board = board
           camp = camp
+          captured = captured
           data = { fromPosition = fromPosition } } ->
 
         findCell board fromPosition
         |> Result.bind validatePieceExists
         |> Result.bind (validatePieceCamp camp)
         |> Result.bind (addValidPositions board camp fromPosition)
-        |> Result.bind (toGameState board camp)
+        |> Result.bind (toGameState board captured)

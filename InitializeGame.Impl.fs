@@ -3,7 +3,6 @@ module ChessGame.InitializeGame.Impl
 open ChessGame.Common
 open ChessGame.Api
 
-// TODO: Find a simpler way to create the board, think unit-test
 let defaultGrid: List<List<Option<(Camp * PieceKind)>>> =
     [ [ Some(Black, Rook)
         Some(Black, Bishop)
@@ -75,4 +74,6 @@ let initializeGame: InitializeGame =
         let board = gridToBoard defaultGrid
         let status = PickingPiece White
 
-        { board = board; status = status }
+        { board = board
+          status = status
+          captured = [] }

@@ -152,7 +152,6 @@ let isInitialPawnPlace (camp: Camp) (position: Position) : bool =
 
 let getPawnValidPositions board camp : GetValidPositions =
     // TODO: When Pawn reach the adverse last line, it can be changed to any lost piece
-    // TODO: allow 2 move on first move only
     // TODO: "En passant"
     fun position ->
         // Pawn can move forward, one cell at the time

@@ -93,7 +93,11 @@ let drawBoard (board: Board) (possibleMoves: Position list) =
     printfn ""
 
 
-let drawGame ({ board = board; status = status }: GameState) : unit =
+let drawGame
+    ({ board = board
+       status = status
+       captured = captured }: GameState)
+    : unit =
     Console.Clear()
 
     match status with

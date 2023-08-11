@@ -23,6 +23,11 @@ let optionToResult (err: 'e) (option: Option<'a>) : Result<'a, 'e> =
     | Some x -> Ok x
     | None -> Error err
 
+let resultToOption (result: Result<'a, 'e>) : Option<'a> =
+    match result with
+    | Ok value -> Some value
+    | Error _ -> None
+
 let predicateToPassThrough err f x =
     match f x with
     | true -> Ok x

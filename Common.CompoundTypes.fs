@@ -22,7 +22,7 @@ type Cell =
 type PickedPiece =
     { piece: Piece
       position: Position
-      legalMoves: Position list }
+      validPositions: Position list }
 
 type GameStatus =
     | PickingPiece of Camp

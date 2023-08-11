@@ -2,7 +2,7 @@ module ChessGame.PickPiece.Impl
 
 open ChessGame.Common
 open ChessGame.Api
-open ChessGame.Helper.LegalMoves
+open ChessGame.Helper.ValidPositions
 open ChessGame.Helper.Adapters
 
 // --- Sub steps ---
@@ -24,15 +24,18 @@ let validatePieceCamp camp (piece: Piece) =
     | false -> Error(GameError "You cannot move your adverser's pieces")
     | true -> Ok piece
 
-let addLegalMoves position piece =
-    let legalMoves = getLegalMoveFn piece position
+let addValidPositions board camp position piece =
+    let validPositions = getValidPositionsFn board camp piece position
 
-    let pickedPiece: PickedPiece =
-        { piece = piece
-          position = position
-          legalMoves = legalMoves }
+    match List.isEmpty validPositions with
+    | true -> Error(GameError "You cannot move this piece for the moment")
+    | false ->
+        let pickedPiece: PickedPiece =
+            { piece = piece
+              position = position
+              validPositions = validPositions }
 
-    Ok pickedPiece
+        Ok pickedPiece
 
 let toGameState board camp pickedPiece =
     let status = MovingPiece pickedPiece
@@ -41,14 +44,6 @@ let toGameState board camp pickedPiece =
 
 // --- Workflow ---
 
-
-// TODO: During legalMoves computation, check if the cell is empty,
-//       | Empty -> Ok
-//       | Occupied by adverse -> Ok once
-//       | Occupied by me -> Error "Cannot capture your own piece"
-
-// TODO: If legalMoves is Empty, we cannot move the piece and should return an Error
-// TODO: Pawn could move twice when it is its first move
 let pickPiece: PickPiece =
     fun
         { board = board
@@ -58,5 +53,5 @@ let pickPiece: PickPiece =
         findCell board fromPosition
         |> Result.bind validatePieceExists
         |> Result.bind (validatePieceCamp camp)
-        |> Result.bind (addLegalMoves fromPosition)
+        |> Result.bind (addValidPositions board camp fromPosition)
         |> Result.bind (toGameState board camp)

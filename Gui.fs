@@ -107,6 +107,6 @@ let drawGame ({ board = board; status = status }: GameState) : unit =
         printfn "Turn: %s" (camp.ToString())
 
     | MovingPiece pickedPiece ->
-        drawBoard board pickedPiece.legalMoves
+        drawBoard board pickedPiece.validPositions
         printfn "Stage: Make Move"
         printfn "Turn: %s" (pickedPiece.piece.camp.ToString())

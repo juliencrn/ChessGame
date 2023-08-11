@@ -2,15 +2,17 @@ module ChessGame.MovePiece.Impl
 
 open ChessGame.Common
 open ChessGame.Api
+open ChessGame.Helper.Adapters
 
 // --- Sub steps ---
 
-let validateLegalMove (board: Board) (legalMoves: Position list) (toPosition: Position) =
-    if List.contains toPosition legalMoves then
+let validateMove (board: Board) (validPositions: Position list) (toPosition: Position) =
+    if List.contains toPosition validPositions then
         Ok board
     else
-        Error(GameError "Not allowed move")
+        Error(GameError "This move is not allowed")
 
+// TODO: Keep a list of Captured Pieces
 let applyMoveOnBoard (fromPosition: Position) (toPosition: Position) (piece: Piece) (board: Board) =
     let newBoard =
         board
@@ -37,10 +39,9 @@ let movePiece: MovePiece =
         { board = board
           camp = camp
           data = { toPosition = toPosition
-                   pickedPiece = { legalMoves = legalMoves
+                   pickedPiece = { validPositions = validPositions
                                    piece = piece
                                    position = fromPosition } } } ->
-
-        validateLegalMove board legalMoves toPosition
+        validateMove board validPositions toPosition
         |> Result.bind (applyMoveOnBoard fromPosition toPosition piece)
         |> Result.bind (toGameState camp)

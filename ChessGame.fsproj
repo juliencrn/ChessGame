@@ -12,7 +12,7 @@
     <Compile Include="Common.CompoundTypes.fs" />
     <Compile Include="Api.fs" />
     <Compile Include="InitializeGame.Impl.fs" />
-    <Compile Include="Helper.LegalMoves.fs" />
+    <Compile Include="Helper.ValidPositions.fs" />
     <Compile Include="PickPiece.Impl.fs" />
     <Compile Include="MovePiece.Impl.fs" />
     <Compile Include="Gui.fs" />

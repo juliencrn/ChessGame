@@ -139,18 +139,32 @@ let getKnightValidPositions board camp : GetValidPositions =
             | Occupied piece -> if piece.camp = camp then None else Some cell.position)
         |> filterNonePositions
 
+let isInitialPawnPlace (camp: Camp) (position: Position) : bool =
+    let initialPawnPositions camp =
+        let f rank =
+            File.getAll () |> List.map (fun file -> Position.create file rank)
+
+        match camp with
+        | White -> f Rank2
+        | Black -> f Rank7
+
+    List.contains position (initialPawnPositions camp)
+
 let getPawnValidPositions board camp : GetValidPositions =
     // TODO: When Pawn reach the adverse last line, it can be changed to any lost piece
     // TODO: allow 2 move on first move only
     // TODO: "En passant"
     fun position ->
         // Pawn can move forward, one cell at the time
-        let positionsWhenCapturing: Position list =
+        let capturingMoves =
             // white move top, black move bottom
             if camp = White then
                 [ Position.getTopLeftPosition; Position.getTopRightPosition ]
             else
                 [ Position.getDownLeftPosition; Position.getDownRightPosition ]
+
+        let positionsWhenCapturing: Position list =
+            capturingMoves
             |> getPossibleNextCells board position
             |> List.map (fun cell ->
                 match cell.state with
@@ -160,12 +174,15 @@ let getPawnValidPositions board camp : GetValidPositions =
 
 
         // Pawn can eat adverse one cell forward at left or right (diagonal)
-        let positionsWhenMovingForward =
+        let classicMoves =
             // white move top, black move bottom
             if camp = White then
                 [ Position.getTopPosition ]
             else
                 [ Position.getDownPosition ]
+
+        let positionsWhenMovingForward =
+            classicMoves
             |> getPossibleNextCells board position
             |> List.map (fun cell ->
                 // Pawn cannot move forward if the next position is Occupied
@@ -174,8 +191,24 @@ let getPawnValidPositions board camp : GetValidPositions =
                 | Occupied _ -> None)
             |> filterNonePositions
 
+        if List.length positionsWhenMovingForward > 0 && isInitialPawnPlace camp position then
+            // new move forward
+            let positionsWhenMovingForwardTwice =
+                classicMoves
+                |> getPossibleNextCells board positionsWhenMovingForward[0]
+                |> List.map (fun cell ->
+                    // Pawn cannot move forward if the next position is Occupied
+                    match cell.state with
+                    | Empty -> Some cell.position
+                    | Occupied _ -> None)
+                |> filterNonePositions
 
-        List.concat [ positionsWhenCapturing; positionsWhenMovingForward ]
+            List.concat
+                [ positionsWhenCapturing
+                  positionsWhenMovingForward
+                  positionsWhenMovingForwardTwice ]
+        else
+            List.concat [ positionsWhenCapturing; positionsWhenMovingForward ]
 
 let getValidPositionsFn (board: Board) (camp: Camp) (piece: Piece) : GetValidPositions =
     let baseFn =

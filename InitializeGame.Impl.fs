@@ -72,10 +72,7 @@ let gridToBoard (grid: List<List<Option<(Camp * PieceKind)>>>) : Board =
 
 let initializeGame: InitializeGame =
     fun () ->
-
-
         let board = gridToBoard defaultGrid
-
-        let status = PickingPiece Black
+        let status = PickingPiece White
 
         { board = board; status = status }

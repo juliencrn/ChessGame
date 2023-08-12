@@ -13,13 +13,7 @@ type GetValidPositions = Position -> Position list
 let findCell (board: Board) (position: Position) =
     board |> List.tryFind (fun cell -> cell.position = position)
 
-let filterNonePositions (items: List<Option<'a>>) : List<'a> =
-    items
-    |> List.map (fun option ->
-        match option with
-        | Some item -> [ item ]
-        | None -> [])
-    |> List.concat
+
 
 let getPossibleNextCells board position (fns: List<Position -> Result<Position, string>>) =
     fns
@@ -151,7 +145,6 @@ let isInitialPawnPlace (camp: Camp) (position: Position) : bool =
     List.contains position (initialPawnPositions camp)
 
 let getPawnValidPositions board camp : GetValidPositions =
-    // TODO: When Pawn reach the adverse last line, it can be changed to any lost piece
     // TODO: "En passant"
     fun position ->
         // Pawn can move forward, one cell at the time

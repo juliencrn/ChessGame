@@ -44,3 +44,11 @@ let rec transformResultsToListResult resultList =
             | Ok value -> Ok(value :: restResults)
             | Error err -> Error err
         | Error err -> Error err
+
+let filterNonePositions (items: List<Option<'a>>) : List<'a> =
+    items
+    |> List.map (fun option ->
+        match option with
+        | Some item -> [ item ]
+        | None -> [])
+    |> List.concat
